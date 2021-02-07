@@ -1,5 +1,6 @@
 // feature one (1) tokko
 import React from "react";
+import Cart from "./components/Cart";
 import Filter from "./components/Filter";
 import Products from "./components/Products";
 import data from "./data.json";
@@ -11,8 +12,30 @@ class App extends React.Component {
     this.state = {
       products: data.products,
       size: "",
-      sort: ""
+      sort: "",
+      cartItems: []
     }
+  }
+
+
+  removeFromCart = product => {
+    const cartItems = this.state.cartItems.slice();
+    this.setState({cartItems: cartItems.filter(item => item._id !== product._id)});
+  }
+
+  addToCart = product => {
+    const cartItems = this.state.cartItems.slice();
+    let alreadyInCart = false;
+    cartItems.forEach(item => {
+      if(item._id == product._id) {
+        item.count++;
+        alreadyInCart = true;
+      }
+    });
+    if(!alreadyInCart) {
+      cartItems.push({...product, count: 1});
+    }
+    this.setState({cartItems});
   }
 
   sortProducts = (event) => {
@@ -62,10 +85,10 @@ class App extends React.Component {
               >
 
               </Filter>
-              <Products products={this.state.products}/>
+              <Products products={this.state.products} addToCart={this.addToCart}/>
             </div>
             <div className="sidebar">
-              cart items
+              <Cart cartItems={this.state.cartItems} removeFromCart={this.removeFromCart}/>
             </div>
           </div>
         </main>
